@@ -1,75 +1,146 @@
 package fobb;
 
 /**
- * TestSavingsAccount.java
- * Test program to demonstrate SavingsAccount functionality
- * Compatible with Ammar's Account base class
+ *
+ * @author Daniel Menezes
  */
-public class TestSavingsAccount {
+public class BankingSystemTest {
+
     public static void main(String[] args) {
-        System.out.println("=== SAVINGS ACCOUNT TEST ===\n");
-        
-        // Create a savings account
-        SavingsAccount savings = new SavingsAccount(
-            "SAV123456",              // Account number (8-10 digits as per Ammar's validation)
-            "John Doe",               // Account holder
-            5000.00,                  // Initial balance
-            0.03,                     // 3% annual interest rate
-            1000.00,                  // Minimum balance required
-            2000.00                   // Withdrawal limit per transaction
+        System.out.println("=== BANKING SYSTEM TEST ===");
+
+        // 1. Account (parent class)
+        System.out.println("\n--- 1. Account (base class) ---");
+        Account baseAccount = new Account(
+                "10000001",
+                "Alice Smith",
+                1000.0
         );
-        
-        System.out.println("=== 1. INITIAL ACCOUNT INFO ===");
+
+        baseAccount.displayAccountInfo();
+
+        System.out.println("\nDeposit 250 into base account");
+        baseAccount.deposit(250.0);
+        baseAccount.displayAccountInfo();
+
+        System.out.println("\nTry to withdraw 2000 (more than balance)");
+        boolean baseWithdraw1 = baseAccount.withdraw(2000.0);
+        System.out.println("Success? " + baseWithdraw1);
+        baseAccount.displayAccountInfo();
+
+        System.out.println("\nWithdraw 500 (valid)");
+        boolean baseWithdraw2 = baseAccount.withdraw(500.0);
+        System.out.println("Success? " + baseWithdraw2);
+        baseAccount.displayAccountInfo();
+
+        System.out.println("\nBase account interest:");
+        baseAccount.calculateInterest();
+
+        // 2. SavingsAccount
+        System.out.println("\n--- 2. SavingsAccount ---");
+        SavingsAccount savings = new SavingsAccount(
+                "12345678",
+                "John Doe",
+                5000.0,
+                0.03, // 3% annual
+                1000.0, // minimum balance
+                2000.0 // per‑transaction limit
+        );
+
+        System.out.println("\nInitial savings account:");
         savings.displaySavingsAccountInfo();
-        
-        System.out.println("\n=== 2. TESTING DEPOSIT ===");
-        savings.deposit(500.00);
-        System.out.println("Current balance: $" + String.format("%.2f", savings.getBalance()));
-        
-        System.out.println("\n=== 3. TESTING WITHDRAWAL RULES ===");
-        
-        // Test 1: Try to withdraw more than limit
-        System.out.println("\nTest 1 - Withdraw $2500 (limit is $2000):");
-        boolean result1 = savings.withdraw(2500.00);
-        System.out.println("Withdrawal successful? " + result1);
-        
-        // Test 2: Try to withdraw below minimum (would trigger both rules)
-        System.out.println("\nTest 2 - Withdraw $4500 (would go below $1000 minimum):");
-        boolean result2 = savings.withdraw(4500.00);
-        System.out.println("Withdrawal successful? " + result2);
-        
-        // Test 3: Valid withdrawal
-        System.out.println("\nTest 3 - Withdraw $1000 (valid - within limits):");
-        boolean result3 = savings.withdraw(1000.00);
-        System.out.println("Withdrawal successful? " + result3);
-        System.out.println("Balance after withdrawal: $" + 
-                          String.format("%.2f", savings.getBalance()));
-        
-        System.out.println("\n=== 4. TESTING INTEREST CALCULATION ===");
-        // Simulate 6 months passing
-        System.out.println("\nSimulating 6 months of account activity...");
+
+        System.out.println("\nDeposit 500 into savings");
+        savings.deposit(500.0);
+        System.out.println("Balance: " + String.format("%.2f", savings.getBalance()));
+
+        System.out.println("\nWithdraw 2500 (over limit 2000)");
+        boolean savW1 = savings.withdraw(2500.0);
+        System.out.println("Success? " + savW1);
+        System.out.println("Balance: " + String.format("%.2f", savings.getBalance()));
+
+        System.out.println("\nWithdraw 4500 (would go under minimum balance)");
+        boolean savW2 = savings.withdraw(4500.0);
+        System.out.println("Success? " + savW2);
+        System.out.println("Balance: " + String.format("%.2f", savings.getBalance()));
+
+        System.out.println("\nWithdraw 1000 (valid)");
+        boolean savW3 = savings.withdraw(1000.0);
+        System.out.println("Success? " + savW3);
+        System.out.println("Balance: " + String.format("%.2f", savings.getBalance()));
+
+        System.out.println("\nAdd 6 months to savings account");
         for (int i = 0; i < 6; i++) {
             savings.incrementMonth();
         }
-        
-        // Calculate and display interest
-        System.out.println("\nCalculating interest...");
+
+        System.out.println("\nSavings interest (calculateInterest):");
         savings.calculateInterest();
-        
-        // Apply the interest to the account
-        System.out.println("\nApplying interest to account...");
+
+        System.out.println("\nApply interest to savings account");
         savings.applyInterest();
-        
-        System.out.println("\n=== 5. TESTING INTEREST RATE UPDATE ===");
-        savings.updateInterestRate(0.035); // Update to 3.5%
-        
-        System.out.println("\n=== 6. FINAL ACCOUNT INFO ===");
+
+        System.out.println("\nChange savings interest rate to 3.5%");
+        savings.updateInterestRate(0.035);
+
+        System.out.println("\nFinal savings account:");
         savings.displaySavingsAccountInfo();
-        
-        System.out.println("\n=== 7. TESTING ACCOUNT INFO METHODS ===");
-        System.out.println("\nUsing parent's displayAccountInfo():");
+
+        System.out.println("\nParent view of savings account:");
         savings.displayAccountInfo();
-        
-        System.out.println("\n=== TEST COMPLETE ===");
+
+        // 3. CurrentAccount
+        System.out.println("\n--- 3. CurrentAccount ---");
+        CurrentAccount current = new CurrentAccount(
+                "87654321",
+                "Bob Johnson",
+                500.0,
+                1000.0, // overdraft limit
+                10.0, // monthly fee
+                true // business flag
+        );
+
+        System.out.println("\nInitial current account:");
+        current.displayAccountInfo();
+        current.checkOverdraft();
+
+        System.out.println("\nWithdraw 300 (still positive)");
+        boolean curW1 = current.withdraw(300.0);
+        System.out.println("Success? " + curW1);
+        current.displayAccountInfo();
+        current.checkOverdraft();
+
+        System.out.println("\nWithdraw 500 (go into overdraft but within limit)");
+        boolean curW2 = current.withdraw(500.0);
+        System.out.println("Success? " + curW2);
+        current.displayAccountInfo();
+        current.checkOverdraft();
+
+        System.out.println("\nWithdraw 1000 (should fail: beyond overdraft)");
+        boolean curW3 = current.withdraw(1000.0);
+        System.out.println("Success? " + curW3);
+        current.displayAccountInfo();
+        current.checkOverdraft();
+
+        System.out.println("\nApply monthly fee on current account");
+        current.applyMonthlyFee();
+        current.displayAccountInfo();
+        current.checkOverdraft();
+
+        System.out.println("\nCurrent account interest / charge:");
+        current.calculateInterest();
+
+        // 4. Polymorphism with Account[]
+        System.out.println("\n--- 4. Polymorphism (Account[]) ---");
+        Account[] accounts = {baseAccount, savings, current};
+
+        for (Account acc : accounts) {
+            System.out.println("\nAccount: " + acc.getAccountHolder()
+                    + " (" + acc.getAccountNumber() + ")");
+            acc.displayAccountInfo();
+            acc.calculateInterest();
+        }
+
+        System.out.println("\n=== TEST FINISHED ===");
     }
 }
